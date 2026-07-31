@@ -1,10 +1,12 @@
-FROM python:3.9-alpine
+FROM python:3.13-alpine
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
+RUN apk upgrade --no-cache \
+    && apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev \
+    && pip install --no-cache-dir --upgrade pip setuptools wheel \
     && pip install --no-cache-dir -r requirements.txt \
     && apk del .build-deps \
     && addgroup -S appgroup \
