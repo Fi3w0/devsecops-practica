@@ -1,0 +1,34 @@
+title = "gitleaks config - devsecops-practica"
+
+# Partimos de las reglas por defecto de gitleaks (AWS keys, private keys,
+# tokens de github/slack/stripe, etc.) y añadimos reglas propias.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "azure-storage-connection-string"
+description = "Azure Storage Account connection string"
+regex = '''DefaultEndpointsProtocol=https;AccountName=[a-zA-Z0-9]+;AccountKey=[a-zA-Z0-9+/=]{20,};EndpointSuffix=core\.windows\.net'''
+tags = ["azure", "secret"]
+
+[[rules]]
+id = "generic-api-key-assignment"
+description = "Generic API key / secret assigned in code"
+regex = '''(?i)(api[_-]?key|secret|password|token)\s*[:=]\s*["'][a-zA-Z0-9_\-]{16,}["']'''
+tags = ["generic", "secret"]
+
+[[rules]]
+id = "azure-keyvault-url-with-key"
+description = "Azure Key Vault URL containing an embedded key"
+regex = '''https://[a-zA-Z0-9-]+\.vault\.azure\.net/secrets/[a-zA-Z0-9-]+/[a-zA-Z0-9]{32}'''
+tags = ["azure", "keyvault"]
+
+[allowlist]
+description = "Falsos positivos conocidos del repo"
+paths = [
+  '''\.gitleaks\.toml''',
+]
+regexes = [
+  '''KEY_VAULT_URL''',
+  '''os\.environ\.get\("SECRET_NAME"''',
+]
